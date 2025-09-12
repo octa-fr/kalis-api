@@ -1,17 +1,19 @@
 <?php
 
-namespace App\Http\Resources;
+namespace Database\Factories;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
-class ProCategoryResource extends JsonResource
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ProCategory>
+ */
+class ProCategoryFactory extends Factory
 {
-    public function toArray(Request $request): array
+    public function definition(): array
     {
         return [
-            'id'   => $this->id,
-            'name' => $this->name,
+            'name' => $this->faker->word(),
+            'description' => $this->faker->sentence(),
         ];
     }
 }

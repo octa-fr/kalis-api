@@ -1,23 +1,25 @@
 <?php
 
-namespace App\Http\Resources;
+namespace Database\Factories;
 
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use App\Models\Category;
+use App\Models\ProCategory;
 
-class ExerciseResource extends JsonResource
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Exercise>
+ */
+class ExerciseFactory extends Factory
 {
-    public function toArray(Request $request): array
+    public function definition(): array
     {
         return [
-            'id'       => $this->id,
-            'title'    => $this->title,
-            'steps'    => $this->steps,
-            'image'    => $this->image,
-            'category' => new CategoryResource($this->whenLoaded('category')),
-            'pro_category' => new ProCategoryResource($this->whenLoaded('proCategory')),
-            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
-            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
+            'title' => $this->faker->sentence(3),
+            'steps' => $this->faker->paragraph(),
+            'etype' => $this->faker->randomElement(['beginner', 'intermediate', 'advanced']),
+            'image' => $this->faker->imageUrl(640, 480, 'sports', true, 'exercise'),
+            'category_id' => Category::factory(),
+            'pro_category_id' => ProCategory::factory(),
         ];
     }
 }

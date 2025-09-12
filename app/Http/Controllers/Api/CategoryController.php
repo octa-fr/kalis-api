@@ -23,4 +23,4 @@ class CategoryController extends Controller
         $category = Category::create($request->all());
         return response()->json($category, 201);
     }
-}
+}   
