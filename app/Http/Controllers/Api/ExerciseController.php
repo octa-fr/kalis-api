@@ -5,92 +5,67 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Exercise;
 use Illuminate\Http\Request;
-use App\Http\Resources\ExerciseResource;
 
 class ExerciseController extends Controller
 {
     public function index()
     {
-        $exercises = Exercise::with(['category', 'proCategory'])->get();
-
-        return response()->json([
-            'status' => 'success',
-            'data' => ExerciseResource::collection($exercises)
-        ]);
-    }
-
-    public function show($id)
-    {
-        $exercise = Exercise::with(['category', 'proCategory'])->find($id);
-
-        if (!$exercise) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Exercise not found'
-            ], 404);
-        }
-
-        return response()->json([
-            'status' => 'success',
-            'data' => new ExerciseResource($exercise)
-        ]);
+        return response()->json(Exercise::with('category')->get());
     }
 
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|string',
-            'steps' => 'required|string',
             'category_id' => 'required|exists:categories,id',
-            'pro_category_id' => 'nullable|exists:pro_categories,id',
-            'image' => 'nullable|string'
+            'title' => 'required|string|max:255',
+            'function' => 'required|string|max:255',
+            'description' => 'required|string',
+            'steps' => 'required|string',
+            'image' => 'nullable|string',
         ]);
 
         $exercise = Exercise::create($request->all());
 
         return response()->json([
-            'status' => 'success',
-            'message' => 'Exercise created',
-            'data' => new ExerciseResource($exercise->load(['category','proCategory']))
+            'message' => 'Exercise created successfully',
+            'exercise' => $exercise,
         ], 201);
+    }
+
+    public function show($id)
+    {
+        $exercise = Exercise::with('category')->findOrFail($id);
+        return response()->json($exercise);
     }
 
     public function update(Request $request, $id)
     {
-        $exercise = Exercise::find($id);
+        $exercise = Exercise::findOrFail($id);
 
-        if (!$exercise) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Exercise not found'
-            ], 404);
-        }
+        $request->validate([
+            'category_id' => 'sometimes|required|exists:categories,id',
+            'title' => 'sometimes|required|string|max:255',
+            'function' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|required|string',
+            'steps' => 'sometimes|required|string',
+            'image' => 'nullable|string',
+        ]);
 
         $exercise->update($request->all());
 
         return response()->json([
-            'status' => 'success',
-            'message' => 'Exercise updated',
-            'data' => new ExerciseResource($exercise->load(['category','proCategory']))
+            'message' => 'Exercise updated successfully',
+            'exercise' => $exercise,
         ]);
     }
 
     public function destroy($id)
     {
-        $exercise = Exercise::find($id);
-
-        if (!$exercise) {
-            return response()->json([
-                'status' => 'error',
-                'message' => 'Exercise not found'
-            ], 404);
-        }
-
+        $exercise = Exercise::findOrFail($id);
         $exercise->delete();
 
         return response()->json([
-            'status' => 'success',
-            'message' => 'Exercise deleted'
+            'message' => 'Exercise deleted successfully',
         ]);
     }
 }

@@ -5,16 +5,19 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up(): void {
+    public function up(): void
+    {
         Schema::create('categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name'); // Push Day, Leg Day, Pull Day
+            $table->string('name'); 
+            $table->enum('type', ['training', 'program']);
             $table->text('description')->nullable();
             $table->timestamps();
         });
     }
 
-    public function down(): void {
+    public function down(): void
+    {
         Schema::dropIfExists('categories');
     }
 };

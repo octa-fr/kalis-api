@@ -11,7 +11,8 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     public function register(Request $request)  
-    {
+{
+    try {
         $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users',
@@ -29,7 +30,15 @@ class AuthController extends Controller
             'message' => 'Register success',
             'user'    => $user
         ], 201);
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        return response()->json([
+            'message' => 'Periksa Email/Password',
+            'errors'  => $e->errors(),
+        ], 422);
     }
+}
+
 
     public function login(Request $request)
     {

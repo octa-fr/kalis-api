@@ -7,29 +7,20 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class ExerciseResource extends JsonResource
 {
-    /**
-     * Transform the resource into an array.
-     */
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'title' => $this->title,
-            'steps' => $this->steps,
-            'image' => $this->image,
-            'category' => $this->whenLoaded('category', function () {
-                return [
-                    'id' => $this->category->id,
-                    'name' => $this->category->name,
-                ];
-            }),
-            'pro_category' => $this->whenLoaded('proCategory', function () {
-                return [
-                    'id' => $this->proCategory->id,
-                    'name' => $this->proCategory->name,
-                ];
-            }),
-            'created_at' => $this->created_at->toDateString(),
+            'id'          => $this->id,
+            'category_id' => $this->category_id,
+            'title'       => $this->title,
+            'function'    => $this->function,
+            'description' => $this->description,
+            'steps'       => $this->steps,
+            'image'       => $this->image ? url('storage/' . $this->image) : null,
+            'created_at'  => $this->created_at->toDateTimeString(),
+            'updated_at'  => $this->updated_at->toDateTimeString(),
+
+            'category'    => new CategoryResource($this->whenLoaded('category')),
         ];
     }
 }

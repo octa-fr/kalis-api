@@ -10,16 +10,16 @@ class Exercise extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title', 'steps', 'category_id', 'pro_category_id', 'image'
+        'category_id',
+        'title',
+        'function',
+        'description',
+        'steps',
+        'image',
     ];
 
     public function category()
     {
         return $this->belongsTo(Category::class);
-    }
-
-    public function proCategory()
-    {
-        return $this->belongsTo(ProCategory::class);
     }
 }
