@@ -11,7 +11,7 @@ return new class extends Migration {
             $table->id();
             $table->string('name'); 
             $table->enum('type', ['training', 'program']);
-            $table->text('description')->nullable();
+            $table->string('cate_image')->nullable();
             $table->timestamps();
         });
     }

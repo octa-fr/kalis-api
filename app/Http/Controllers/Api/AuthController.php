@@ -11,36 +11,36 @@ use Illuminate\Validation\ValidationException;
 class AuthController extends Controller
 {
     public function register(Request $request)  
-{
-    try {
-        $request->validate([
-            'name'     => 'required|string|max:255',
-            'email'    => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:6',
-        ]);
+    {
+        try {
+            $request->validate([
+                'name'     => 'required|string|max:255',
+                'email'    => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|min:6',
+            ]);
 
-        $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'password' => Hash::make($request->password),
-            'role'     => 'user'    
-        ]);
+            $user = User::create([
+                'name'     => $request->name,
+                'email'    => $request->email,
+                'password' => Hash::make($request->password),
+                'role'     => 'user'    
+            ]);
 
-        return response()->json([
-            'message' => 'Register success',
-            'user'    => $user
-        ], 201);
+            return response()->json([
+                'message' => 'Register success',
+                'user'    => $user
+            ], 201);
 
-    } catch (\Illuminate\Validation\ValidationException $e) {
-        return response()->json([
-            'message' => 'Periksa Email/Password',
-            'errors'  => $e->errors(),
-        ], 422);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Periksa Email/Password',
+                'errors'  => $e->errors(),
+            ], 422);
+        }
     }
-}
 
 
-    public function login(Request $request)
+    function login(Request $request)
     {
         $request->validate([
             'email'    => 'required|email',
@@ -50,9 +50,9 @@ class AuthController extends Controller
         $user = User::where('email', $request->email)->first();
 
         if (! $user || ! Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
+            return response()->json([
+                'message' => 'Email atau password salah',
+            ], 401);
         }
 
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -61,7 +61,7 @@ class AuthController extends Controller
             'message' => 'Login success',
             'user'    => $user,
             'token'   => $token,
-        ]);
+        ], 200);
     }
 
     public function logout(Request $request)
@@ -71,5 +71,31 @@ class AuthController extends Controller
         return response()->json([
             'message' => 'Logout success'
         ]);
+    }   
+
+    public function index()
+    {
+        $users = User::where('role', 'user')->get();
+
+        return response()->json($users);
     }
+    
+    public function destroy($id)
+    {
+        $user = User::find($id);
+
+        if (!$user) {
+            return response()->json(['message' => 'User tidak ditemukan'], 404);
+        }
+
+        // kalau tidak ingin admin bisa dihapus, tambahkan check
+        if ($user->role === 'admin') {
+            return response()->json(['message' => 'Admin tidak boleh dihapus'], 403);
+        }
+
+        $user->delete();
+
+        return response()->json(['message' => 'User berhasil dihapus']);
+    }
+
 }

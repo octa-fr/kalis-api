@@ -11,7 +11,7 @@ class CategoryFactory extends Factory
         return [
             'name' => $this->faker->word(),
             'type' => $this->faker->randomElement(['training', 'program']),
-            'description' => $this->faker->sentence(),
+            'cate_image' => $this->faker->imageUrl(640, 480, 'sports', true),
         ];
     }
 }

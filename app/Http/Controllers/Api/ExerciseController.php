@@ -14,23 +14,31 @@ class ExerciseController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'title' => 'required|string|max:255',
-            'function' => 'required|string|max:255',
-            'description' => 'required|string',
-            'steps' => 'required|string',
-            'image' => 'nullable|string',
-        ]);
+{
+    $request->validate([
+        'category_id' => 'required|exists:categories,id',
+        'title' => 'required|string|max:255',
+        'function' => 'required|string|max:255',
+        'description' => 'required|string',
+        'steps' => 'required|string',
+        'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    ]);
 
-        $exercise = Exercise::create($request->all());
+    $data = $request->only(['category_id', 'title', 'function', 'description', 'steps']);
 
-        return response()->json([
-            'message' => 'Exercise created successfully',
-            'exercise' => $exercise,
-        ], 201);
+    if ($request->hasFile('image')) {
+        $path = $request->file('image')->store('exercises', 'public');
+        $data['image'] = $path;
     }
+
+    $exercise = Exercise::create($data);
+
+    return response()->json([
+        'message' => 'Exercise created successfully',
+        'exercise' => $exercise,
+    ], 201);
+}
+
 
     public function show($id)
     {
@@ -39,25 +47,29 @@ class ExerciseController extends Controller
     }
 
     public function update(Request $request, $id)
-    {
-        $exercise = Exercise::findOrFail($id);
+{
+    $exercise = Exercise::findOrFail($id);
 
-        $request->validate([
-            'category_id' => 'sometimes|required|exists:categories,id',
-            'title' => 'sometimes|required|string|max:255',
-            'function' => 'sometimes|required|string|max:255',
-            'description' => 'sometimes|required|string',
-            'steps' => 'sometimes|required|string',
-            'image' => 'nullable|string',
-        ]);
+    $exercise->update([
+        'category_id' => $request->category_id,
+        'title' => $request->title,
+        'description' => $request->description,
+        'function' => $request->function,
+        'steps' => $request->steps,
+    ]);
 
-        $exercise->update($request->all());
-
-        return response()->json([
-            'message' => 'Exercise updated successfully',
-            'exercise' => $exercise,
-        ]);
+    if ($request->hasFile('image')) {
+        $imagePath = $request->file('image')->store('exercises', 'public');
+        $exercise->image = $imagePath;
+        $exercise->save();
     }
+
+    return response()->json([
+        'message' => 'Exercise updated successfully',
+        'data' => $exercise,
+    ]);
+}
+
 
     public function destroy($id)
     {

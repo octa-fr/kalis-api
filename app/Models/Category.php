@@ -9,14 +9,10 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = [
-        'name',
-        'type',
-        'description',
-    ];
+    protected $fillable = ['name', 'type', 'cate_image'];
 
     public function exercises()
     {
-        return $this->hasMany(Exercise::class);
+        return $this->hasMany(Exercise::class, 'category_id');
     }
 }

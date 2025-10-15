@@ -24,3 +24,4 @@ class ProCategoryController extends Controller
         return response()->json($proCategory, 201);
     }
 }
+    
